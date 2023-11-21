@@ -11,4 +11,7 @@ public class RpcDTO<T> {
     private String message;
     Exception exception;
     T data;
+    boolean isSuccess() {
+        return code == 0;
+    }
 }

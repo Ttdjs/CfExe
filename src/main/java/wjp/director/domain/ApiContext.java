@@ -2,10 +2,7 @@ package wjp.director.domain;
 
 import wjp.director.domain.DTO.RpcDTO;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 
 public class ApiContext {
@@ -25,7 +22,7 @@ public class ApiContext {
     }
 
     public CompletableFuture<RpcDTO<?>> queryResultByTask(Task task) {
-        // todo 返回一个异常的CF
-        return resultMap.getOrDefault(task, null);
+        // todo 统一定义错误码
+        return resultMap.getOrDefault(task, CompletableFuture.completedFuture(RpcDTO.builder().code(-1).exception(new NoSuchElementException("任务没有结果")).build()));
     }
 }
