@@ -1,5 +1,8 @@
 package org.example;
 
+import java.util.ArrayList;
+import java.util.List;
+
 // Press Shift twice to open the Search Everywhere dialog and type `show whitespaces`,
 // then press Enter. You can now see whitespace characters in your code.
 public class Main {
@@ -15,5 +18,9 @@ public class Main {
             // for you, but you can always add more by pressing Cmd+F8.
             System.out.println("i = " + i);
         }
+        List<? super Integer> list = new ArrayList<Number>();
+        list.add(1);  // 正确，可以向List<? super Integer>中添加Integer类型的元素
+        Object obj = list.get(0);
+
     }
 }
