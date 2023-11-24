@@ -9,7 +9,7 @@ import lombok.Data;
 public class RpcDTO<T> {
     private int code;
     private String message;
-    Exception exception;
+    Throwable exception;
     T data;
     boolean isSuccess() {
         return code == 0;
