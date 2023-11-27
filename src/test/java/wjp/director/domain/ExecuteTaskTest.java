@@ -8,7 +8,7 @@ import java.util.Objects;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class TaskTest {
+class ExecuteTaskTest {
 
     @org.junit.jupiter.api.Test
     void doHandler() throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
@@ -19,10 +19,19 @@ class TaskTest {
         Assert.assertEquals(invoke, "wjp");
     }
 
-    class Student {
+    class Student extends People{
         String defaultName = "wjp";
         public String getName() {
             return defaultName;
         }
+    }
+    class People {
+        public People() {
+            System.out.println(this.getClass().getSimpleName());
+        }
+    }
+    @org.junit.jupiter.api.Test
+    public void testFather() {
+        new Student();
     }
 }
