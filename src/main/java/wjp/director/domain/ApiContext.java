@@ -17,13 +17,9 @@ import java.util.concurrent.CompletableFuture;
 @Builder
 public class ApiContext {
     PlayBook playBook;
-    private Map<Task, CompletableFuture<DataDTO<?>>> resultMap;
-//    private
+    private Map<ExecuteTask, CompletableFuture<DataDTO<?>>> resultMap;
     @Getter
     private ParamDTO paramDTO;
-
-    @Setter
-    DataDTO<?> result;
 
     public List<ExecuteTask> queryDependencyByTask(ExecuteTask executeTask) {
         return playBook.queryDependencyByTask(executeTask);
@@ -33,14 +29,10 @@ public class ApiContext {
         return resultMap.getOrDefault(task, CompletableFuture.completedFuture(DataDTO.builder().code(-1).exception(new NoSuchElementException("任务没有结果")).build()));
     }
 
-    public void putResultForTask(Task executeTask, CompletableFuture<DataDTO<?>> result) {
+    public void putResultForTask(ExecuteTask executeTask, CompletableFuture<DataDTO<?>> result) {
         resultMap.put(executeTask, result);
     }
     public List<ExecuteTask> queryAggreTaskDependency() {
         return playBook.getAggreTaskDepedency();
-    }
-
-    public <T> DataDTO<T> getResult() {
-        return (DataDTO<T>) result;
     }
 }

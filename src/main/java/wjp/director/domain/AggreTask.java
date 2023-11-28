@@ -42,10 +42,8 @@ public class AggreTask extends Task{
                 return result;
             });
             rpcResult = DataDTO.builder().data(resultFuture.get(10, TimeUnit.MILLISECONDS)).build();
-            apiContext.setResult(rpcResult);
         } catch (Exception e) {
             rpcResult =  DataDTO.builder().message( this.getClass().getSimpleName() + "聚合函数执行错误" + e.getMessage()).exception(e).data(null).build();
-            apiContext.setResult(rpcResult);
         }
         return rpcResult;
     }
