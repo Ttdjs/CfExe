@@ -12,9 +12,8 @@ import java.util.*;
 /**
  * @author lingse
  */
-@Builder
 public class PlayBook {
-    private String apiName;
+    private final String apiName;
     // 依赖关系
     private Map<ExecuteTask, List<ExecuteTask>> dependencys = new HashMap<>();
     // todo 不可变
@@ -25,7 +24,7 @@ public class PlayBook {
     @Getter
     private AggreTask aggreTask;
     @Getter
-    private  boolean ready;
+    private boolean ready;
     public PlayBook(String name) {
         this.apiName = name;
     }
