@@ -2,19 +2,19 @@ package wjp.director.domain;
 
 import lombok.Builder;
 import lombok.extern.slf4j.Slf4j;
-import wjp.director.domain.DTO.RpcDTO;
+import wjp.director.domain.DTO.DataDTO;
 
 import java.util.function.BiFunction;
 
 @Builder
 @Slf4j
-public class DefaultHandler implements BiFunction<Object, Throwable, RpcDTO<?>> {
+public class DefaultHandler implements BiFunction<Object, Throwable, DataDTO<?>> {
     private Class<?> defaultValue;
     private boolean logResult;
     private ApiContext apiContext;
     private String name;
     @Override
-    public RpcDTO<?> apply(Object result, Throwable r) {
+    public DataDTO<?> apply(Object result, Throwable r) {
         // todo 日志打点
         if (logResult) {
             if (r != null) {
@@ -23,13 +23,13 @@ public class DefaultHandler implements BiFunction<Object, Throwable, RpcDTO<?>> 
             log.info("任务" + name + "执行结果是 {}", result);
         }
         if (r != null) {
-            return RpcDTO.builder()
+            return DataDTO.builder()
                     .exception(r)
                     .message(r.getMessage())
                     .data(defaultValue)
                     .build();
         } else {
-            return RpcDTO.builder()
+            return DataDTO.builder()
                     .data(result)
                     .build();
         }

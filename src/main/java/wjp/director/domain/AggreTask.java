@@ -1,11 +1,14 @@
 package wjp.director.domain;
 
 import wjp.director.annotation.AggreMethod;
-import wjp.director.domain.DTO.RpcDTO;
+import wjp.director.domain.DTO.DataDTO;
 
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 /**
@@ -25,14 +28,26 @@ public class AggreTask extends Task{
         }
         doAggreMethod = methods.get(0);
     }
-    public void doAggre(ApiContext apiContext) {
+    @SuppressWarnings("unchecked")
+    public DataDTO<?> doAggre(ApiContext apiContext) {
+        DataDTO<?> rpcResult;
         try {
-            Object[] arguments = this.getParas(apiContext, doAggreMethod);
-            Object result = doAggreMethod.invoke(this, arguments);
-            apiContext.setResult(RpcDTO.builder().data(result).build());
+            CompletableFuture<Object> resultFuture = this.getParas(apiContext, doAggreMethod).thenApply(arguments -> {
+                Object result = null;
+                try {
+                    result = doAggreMethod.invoke(this, arguments);
+                } catch (IllegalAccessException | InvocationTargetException e) {
+                    throw new RuntimeException(e);
+                }
+                return result;
+            });
+            rpcResult = DataDTO.builder().data(resultFuture.get(10, TimeUnit.MILLISECONDS)).build();
+            apiContext.setResult(rpcResult);
         } catch (Exception e) {
-            apiContext.setResult(RpcDTO.builder().message( this.getClass().getSimpleName() + "聚合函数执行错误" + e.getMessage()).exception(e).data(null).build());
+            rpcResult =  DataDTO.builder().message( this.getClass().getSimpleName() + "聚合函数执行错误" + e.getMessage()).exception(e).data(null).build();
+            apiContext.setResult(rpcResult);
         }
+        return rpcResult;
     }
     @Override
     public List<? extends Task> getDependency(ApiContext apiContext) {

@@ -1,12 +1,12 @@
 package wjp.director.domain;
 
+import lombok.EqualsAndHashCode;
 import lombok.extern.slf4j.Slf4j;
 import wjp.director.annotation.HandlerMethod;
-import wjp.director.domain.DTO.RpcDTO;
 
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
@@ -15,6 +15,7 @@ import java.util.stream.Collectors;
  * @author lingse
  */
 @Slf4j
+@EqualsAndHashCode(callSuper = true)
 public class ExecuteTask extends Task{
     private Method doHandlermethod;
     public ExecuteTask() {
@@ -35,16 +36,23 @@ public class ExecuteTask extends Task{
     public void doHandler(ApiContext apiContext) {
         CompletableFuture<?> res;
         try {
-            Object[] argument = this.getParas(apiContext, doHandlermethod);
-            // todo 同步转异步
-            Object invokeResult = doHandlermethod.invoke(this, argument);
-            if (invokeResult instanceof CompletableFuture) {
-                res = (CompletableFuture<?>) invokeResult;
-            } else {
-                CompletableFuture<Object> objectCompletableFuture = new CompletableFuture<>();
-                objectCompletableFuture.complete(invokeResult);
-                res = objectCompletableFuture;
-            }
+            res = this.getParas(apiContext, doHandlermethod).thenCompose(argument -> {
+                CompletableFuture<?> midRes;
+                try {
+                    // todo 同步转异步
+                    Object invokeResult = doHandlermethod.invoke(this, argument);
+                    if (invokeResult instanceof CompletableFuture) {
+                        midRes = (CompletableFuture<?>) invokeResult;
+                    } else {
+                        CompletableFuture<Object> objectCompletableFuture = new CompletableFuture<>();
+                        objectCompletableFuture.complete(invokeResult);
+                        midRes = objectCompletableFuture;
+                    }
+                } catch (IllegalAccessException | InvocationTargetException e) {
+                    throw new RuntimeException(e);
+                }
+                return midRes;
+            });
         } catch (Exception e) {
             res = new CompletableFuture<>();
             res.completeExceptionally(e);
