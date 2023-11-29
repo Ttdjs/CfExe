@@ -27,6 +27,7 @@ public class AggreTask extends Task{
             throw new RuntimeException(this.getClass().getSimpleName() +  "任务上没有指定的聚合方法");
         }
         doAggreMethod = methods.get(0);
+        doAggreMethod.setAccessible(true);
     }
     @SuppressWarnings("unchecked")
     public DataDTO<?> doAggre(ApiContext apiContext) {
@@ -41,7 +42,7 @@ public class AggreTask extends Task{
                 }
                 return result;
             });
-            rpcResult = DataDTO.builder().data(resultFuture.get(10, TimeUnit.MILLISECONDS)).build();
+            rpcResult = DataDTO.builder().data(resultFuture.get(10, TimeUnit.SECONDS)).build();
         } catch (Exception e) {
             rpcResult =  DataDTO.builder().message( this.getClass().getSimpleName() + "聚合函数执行错误" + e.getMessage()).exception(e).data(null).build();
         }

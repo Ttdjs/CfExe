@@ -32,6 +32,7 @@ public class ExecuteTask extends Task{
         }
         
         doHandlermethod = methods.get(0);
+        doHandlermethod.setAccessible(true);
     }
     public void doHandler(ApiContext apiContext) {
         CompletableFuture<?> res;

@@ -17,9 +17,10 @@ import java.util.concurrent.CompletableFuture;
 @Builder
 public class ApiContext {
     PlayBook playBook;
-    private Map<ExecuteTask, CompletableFuture<DataDTO<?>>> resultMap;
+    final private Map<ExecuteTask, CompletableFuture<DataDTO<?>>> resultMap = new HashMap<>();
     @Getter
-    private ParamDTO paramDTO;
+    // todo ParamDTO
+    private String paramDTO;
 
     public List<ExecuteTask> queryDependencyByTask(ExecuteTask executeTask) {
         return playBook.queryDependencyByTask(executeTask);
@@ -33,6 +34,6 @@ public class ApiContext {
         resultMap.put(executeTask, result);
     }
     public List<ExecuteTask> queryAggreTaskDependency() {
-        return playBook.getAggreTaskDepedency();
+        return playBook.getAggreTaskDepedencys();
     }
 }
