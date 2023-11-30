@@ -12,7 +12,7 @@ import java.util.concurrent.CompletableFuture;
 public class RpcTaskB extends ExecuteTask {
     private final RpcManager rpcManager = new RpcManager();
     @HandlerMethod
-    CompletableFuture<String> doHandler(String param) {
+    public CompletableFuture<String> doHandler(String param) {
         return rpcManager.get("B").thenApply(x -> x + param);
     }
 }

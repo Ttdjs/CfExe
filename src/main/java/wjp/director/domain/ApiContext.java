@@ -20,7 +20,7 @@ public class ApiContext {
     final private Map<ExecuteTask, CompletableFuture<DataDTO<?>>> resultMap = new HashMap<>();
     @Getter
     // todo ParamDTO
-    private String paramDTO;
+    private Object paramDTO;
 
     public List<ExecuteTask> queryDependencyByTask(ExecuteTask executeTask) {
         return playBook.queryDependencyByTask(executeTask);

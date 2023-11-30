@@ -9,11 +9,11 @@ import java.util.concurrent.CompletableFuture;
 /**
  * @author lingse
  */
-public class RpcTaskA extends ExecuteTask {
+public class RpcTaskH extends ExecuteTask {
     private final RpcManager rpcManager = new RpcManager();
     @HandlerMethod
-    public CompletableFuture<String> doHandler(String param) {
-        return rpcManager.get("A").thenApply(x -> { return x + param;
+    public CompletableFuture<String> doHandler(String param, String param2, String param3, String param4) {
+        return rpcManager.get("D").thenApply(x -> { return x + param + param2 + param3 + param4;
         });
     }
 }
