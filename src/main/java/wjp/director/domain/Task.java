@@ -19,9 +19,8 @@ public class Task {
         if (dependencyExecuteTask.size() != parameterCount && dependencyExecuteTask.size() + 1 != parameterCount) {
             throw new RuntimeException(this.getClass().getSimpleName() +  "任务参数列表和依赖列表数量不匹配");
         }
+        Class<?>[] parameterTypes = doHandlermethod.getParameterTypes();
         final boolean needParamDTO = dependencyExecuteTask.size() != parameterCount;
-
-
         return  CompletableFuture.allOf(argumentFuture.toArray(new CompletableFuture[0])).thenApply(
                 x -> {
                     Object[] argument = new Object[parameterCount];
@@ -31,7 +30,12 @@ public class Task {
                     int beginIndex = needParamDTO ? 1 : 0;
                     for (int i = 0; i < argumentFuture.size(); i++) {
                         try {
-                            argument[i + beginIndex] = argumentFuture.get(i).join().getData();
+                            // todo 单测
+                            if (parameterTypes[i].equals(DataDTO.class)) {
+                                argument[i + beginIndex] = argumentFuture.get(i).join();
+                            } else {
+                                argument[i + beginIndex] = argumentFuture.get(i).join().getData();
+                            }
                         } catch (Exception e) {
                             throw new RuntimeException("参数获取错误" + i);
                         }

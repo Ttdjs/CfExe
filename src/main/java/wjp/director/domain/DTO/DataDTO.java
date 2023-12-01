@@ -18,4 +18,11 @@ public class DataDTO<T> {
     boolean isSuccess() {
         return code == 0;
     }
+
+//    public T getData()  {
+//        if (exception != null) {
+//            throw new RuntimeException(exception);
+//        }
+//        return data;
+//    }
 }
