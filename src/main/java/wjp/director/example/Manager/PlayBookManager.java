@@ -34,6 +34,19 @@ public class PlayBookManager {
                 .init();
         playBookMap.put(simple.getApiName(), simple);
     }
+    // b -> a
+    // c -> a
+    // d -> b and d -> c
+    // e -> c and e -> a
+    // f -> c and f -> d
+    // g -> a and g -> c and g -> e
+    // h -> b and h -> a and h -> f and h -> c
+
+    // a
+    // b , c
+    // d , e
+    // f, g
+    // h
     private void initPlayBookComplex() {
         PlayBook complex = PlayBook.getInstance().api("complex")
                 .executeTask(taskA, taskB, taskC, taskD, taskE, taskF, taskG, taskH)

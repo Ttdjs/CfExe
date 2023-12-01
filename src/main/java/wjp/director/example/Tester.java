@@ -10,6 +10,7 @@ import wjp.director.example.Manager.PlayBookManager;
 import java.util.Collections;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
+import java.util.function.Function;
 
 public class Tester {
 
@@ -20,28 +21,43 @@ public class Tester {
         Object res = Collections.emptyMap();
         long startTime = System.currentTimeMillis();
         for (int i  = 0; i < count; i++) {
-            res = directrAccessService.testSimple();
+            res = directrAccessService.testSimple("");
         }
 
         long midTime = System.currentTimeMillis();
         System.out.println(String.format("Director执行次数%d, 耗时%d, 结果%s", count, midTime - startTime, res.toString()));
         for (int i = 0; i < count; i++) {
-           res = cfAccessService.testSimple();
+           res = cfAccessService.testSimple("");
         }
         long endTime = System.currentTimeMillis();
         System.out.println(String.format("CF执行次数%d, 耗时%d, 结果%s", count, endTime - midTime, res.toString()));
 //        System.out.println(res);
     }
-    private static void testComplex(int count) {
+    private static void test(int count, Function<String, Map<String, String>> directorFun, Function<String, Map<String, String>> cfFun, String param) {
         long startTime = System.currentTimeMillis();
-        DirectrAccessService directrAccessService = new DirectrAccessService();
-        Map<String, String> res = directrAccessService.testComplex("");
+        Map<String, String> directorRes = null;
+        for (int i = 0; i < count; i++) {
+            directorRes = directorFun.apply(param);
+        }
+
         long midTime = System.currentTimeMillis();
-        System.out.println(String.format("Director执行次数%d, 耗时%d, 结果%s", count, midTime - startTime, res.toString()));
+        System.out.println(String.format("Director执行次数%d, 耗时%d, 结果%s", count, midTime - startTime, directorRes.toString()));
+        Map<String, String> cfRes = null;
+        for (int i = 0; i < count; i++) {
+            cfRes = cfFun.apply(param);
+        }
+        long endTime = System.currentTimeMillis();
+        System.out.println(String.format("CF执行次数%d, 耗时%d, 结果%s", count, endTime - midTime, cfRes.toString()));
+
+        Map<String, String> finalCfRes = cfRes;
+        cfRes.forEach((key, value) -> {
+            System.out.println("key : " + key + " " + "directorRes: " + value + " cfRes: " + finalCfRes.get(key) + " eauqls: " + value.equals(finalCfRes.get(key)));
+        });
     }
     public static void main(String[] args) {
-//        testOneByDirector();
-//        testSimple(100);
-        testComplex(1);
+        DirectrAccessService directrAccessService = new DirectrAccessService();
+        CFAccessService cfAccessService = new CFAccessService();
+        test(10, directrAccessService::testSimple, cfAccessService::testSimple, "simple");
+        test(10, directrAccessService::testComplex, cfAccessService::testComplex, "complex");
     }
 }
