@@ -9,12 +9,10 @@ import java.util.concurrent.CompletableFuture;
 /**
  * @author lingse
  */
-public class RpcTaskA extends ExecuteTask {
+public class RpcTaskRetVoid extends ExecuteTask {
     private final RpcManager rpcManager = new RpcManager();
-    @HandlerMethod(forceAsync = false)
-    public CompletableFuture<String> doHandler(String param) {
-        return rpcManager.get("A").thenApply(x -> {
-            return x + param.substring(0, param.length());
-        });
+    @HandlerMethod(forceAsync = true)
+    public Void doHandler(String param) {
+        return rpcManager.get("RetVoid").thenRun(() -> {}).join();
     }
 }

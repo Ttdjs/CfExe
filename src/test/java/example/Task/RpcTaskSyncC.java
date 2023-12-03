@@ -4,17 +4,14 @@ import example.Manager.RpcManager;
 import wjp.director.annotation.HandlerMethod;
 import wjp.director.domain.ExecuteTask;
 
-import java.util.concurrent.CompletableFuture;
-
 /**
  * @author lingse
  */
-public class RpcTaskA extends ExecuteTask {
+public class RpcTaskSyncC extends ExecuteTask {
     private final RpcManager rpcManager = new RpcManager();
     @HandlerMethod(forceAsync = false)
-    public CompletableFuture<String> doHandler(String param) {
-        return rpcManager.get("A").thenApply(x -> {
-            return x + param.substring(0, param.length());
-        });
+    public String doHandler(String param) throws InterruptedException {
+        return rpcManager.get("C").thenApply(x -> { return x + param.substring(0, param.length());
+        }).join();
     }
 }

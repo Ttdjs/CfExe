@@ -15,7 +15,7 @@ import java.util.stream.Collectors;
  * @author lingse
  */
 public class AggreTask extends Task{
-    private Method doAggreMethod;
+    private Method invokeMethod;
     public AggreTask() {init();}
     private void init() {
         Method[] declaredMethods = this.getClass().getDeclaredMethods();
@@ -26,17 +26,17 @@ public class AggreTask extends Task{
         if (methods.isEmpty()) {
             throw new RuntimeException(this.getClass().getSimpleName() +  "任务上没有指定的聚合方法");
         }
-        doAggreMethod = methods.get(0);
-        doAggreMethod.setAccessible(true);
+        invokeMethod = methods.get(0);
+        invokeMethod.setAccessible(true);
     }
     @SuppressWarnings("unchecked")
-    public DataDTO<?> doAggre(ApiContext apiContext) {
+    public DataDTO<?> doAggre(Context context) {
         DataDTO<?> rpcResult;
         try {
-            CompletableFuture<Object> resultFuture = this.getParas(apiContext, doAggreMethod).thenApply(arguments -> {
+            CompletableFuture<Object> resultFuture = this.getParas(context).thenApply(arguments -> {
                 Object result = null;
                 try {
-                    result = doAggreMethod.invoke(this, arguments);
+                    result = invokeMethod.invoke(this, arguments);
                 } catch (IllegalAccessException | InvocationTargetException e) {
                     throw new RuntimeException(e);
                 }
@@ -49,7 +49,12 @@ public class AggreTask extends Task{
         return rpcResult;
     }
     @Override
-    public List<? extends Task> getDependency(ApiContext apiContext) {
-        return apiContext.queryAggreTaskDependency();
+    public List<? extends Task> queryDependency(Context context) {
+        return context.queryAggreTaskDependency();
+    }
+
+    @Override
+    public Method queryInvokeMethod() {
+        return invokeMethod;
     }
 }

@@ -6,19 +6,21 @@ import wjp.director.domain.DTO.DataDTO;
 
 import java.util.function.BiFunction;
 
+/**
+ * @author lingse
+ */
 @Builder
 @Slf4j
 public class DefaultHandler implements BiFunction<Object, Throwable, DataDTO<?>> {
-    private Class<?> defaultValue;
+    private Object defaultValue;
     private boolean logResult;
-    private ApiContext apiContext;
+    private Context context;
     private String name;
     @Override
     public DataDTO<?> apply(Object result, Throwable r) {
-        // todo 日志打点
         if (logResult) {
             if (r != null) {
-                log.error("任务" + name + "执行出错，上下文是{}", apiContext, r);
+                log.error("任务" + name + "执行出错，上下文是{}", context, r);
             }
             log.info("任务" + name + "执行结果是 {}", result);
         }

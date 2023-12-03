@@ -1,8 +1,9 @@
 package example.Access;
 
-import wjp.director.domain.ApiContext;
+import example.Manager.TestDataManager;
+import wjp.director.domain.Context;
 import wjp.director.domain.DTO.DataDTO;
-import wjp.director.domain.PlayBook;
+import wjp.director.domain.Scene;
 
 import java.util.Map;
 
@@ -13,16 +14,16 @@ public class DirectrAccessService extends AccessService {
 
     @Override
     public Map<String, String> testSimple(String param) {
-        PlayBook one = this.getPlayBookManager().getPlayBook("simple");
-        ApiContext apiContext = ApiContext.builder().playBook(one).paramDTO(param).build();
-        DataDTO<Map<String, String>> res = one.execute(apiContext);
-        return res.getData();
+       return test("simple", param);
     }
     @Override
     public Map<String, String> testComplex(String param) {
-        PlayBook one = this.getPlayBookManager().getPlayBook("complex");
-        ApiContext apiContext = ApiContext.builder().playBook(one).paramDTO(param).build();
-        DataDTO<Map<String, String>> res = one.execute(apiContext);
+       return test("complex", param);
+    }
+
+    public Map<String, String> test(String api, String param) {
+        Context context = Context.builder().paramDTO(param).build();
+        DataDTO<Map<String, String>> res = TestDataManager.executor.execute(api, context);
         return res.getData();
     }
 

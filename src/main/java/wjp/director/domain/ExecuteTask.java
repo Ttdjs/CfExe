@@ -2,9 +2,9 @@ package wjp.director.domain;
 
 import lombok.EqualsAndHashCode;
 import lombok.extern.slf4j.Slf4j;
+import wjp.director.Manager.ThreadPoolManager;
 import wjp.director.annotation.HandlerMethod;
 
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.List;
@@ -17,7 +17,9 @@ import java.util.stream.Collectors;
 @Slf4j
 @EqualsAndHashCode(callSuper = true)
 public class ExecuteTask extends Task{
-    private Method doHandlermethod;
+    private Method invokeMethod;
+    private boolean forceAsync;
+    private final Object defaultValue = null;
     public ExecuteTask() {
         init();
     }
@@ -31,26 +33,28 @@ public class ExecuteTask extends Task{
             throw new RuntimeException(this.getClass().getSimpleName() +  "任务上没有指定的处理方法");
         }
         
-        doHandlermethod = methods.get(0);
-        doHandlermethod.setAccessible(true);
+        invokeMethod = methods.get(0);
+        invokeMethod.setAccessible(true);
+        HandlerMethod annotation = invokeMethod.getAnnotation(HandlerMethod.class);
+        forceAsync = annotation.forceAsync();
     }
-    public void doHandler(ApiContext apiContext) {
+    public void doHandler(Context context) {
         CompletableFuture<?> res;
         try {
-            res = this.getParas(apiContext, doHandlermethod).thenCompose(argument -> {
+            res = this.getParas(context).thenCompose(argument -> {
                 CompletableFuture<?> midRes;
-                try {
-                    // todo 同步转异步
-                    Object invokeResult = doHandlermethod.invoke(this, argument);
-                    if (invokeResult instanceof CompletableFuture) {
-                        midRes = (CompletableFuture<?>) invokeResult;
-                    } else {
-                        CompletableFuture<Object> objectCompletableFuture = new CompletableFuture<>();
-                        objectCompletableFuture.complete(invokeResult);
-                        midRes = objectCompletableFuture;
-                    }
-                } catch (IllegalAccessException | InvocationTargetException e) {
-                    throw new RuntimeException(e);
+                Object invokeResult;
+                if (forceAsync && !invokeMethod.getReturnType().equals(CompletableFuture.class)) {
+                    invokeResult = CompletableFuture.supplyAsync(() -> this.doInvoke(invokeMethod, argument), ThreadPoolManager.getThreadPool(context.getScript().getName()));
+                } else {
+                    invokeResult = this.doInvoke(invokeMethod, argument);
+                }
+                if (invokeResult instanceof CompletableFuture) {
+                    midRes = (CompletableFuture<?>) invokeResult;
+                } else {
+                    CompletableFuture<Object> objectCompletableFuture = new CompletableFuture<>();
+                    objectCompletableFuture.complete(invokeResult);
+                    midRes = objectCompletableFuture;
                 }
                 return midRes;
             });
@@ -58,10 +62,15 @@ public class ExecuteTask extends Task{
             res = new CompletableFuture<>();
             res.completeExceptionally(e);
         }
-        apiContext.putResultForTask(this, res.handle(DefaultHandler.builder().defaultValue(null).build()));
+        context.putResultForTask(this, res.handle(DefaultHandler.builder().defaultValue(context.queryDefaultValue(this)).build()));
     }
     @Override
-    public List<? extends Task> getDependency(ApiContext apiContext) {
-        return apiContext.queryDependencyByTask(this);
+    public List<? extends Task> queryDependency(Context context) {
+        return context.queryDependency(this);
+    }
+
+    @Override
+    public Method queryInvokeMethod() {
+        return invokeMethod;
     }
 }

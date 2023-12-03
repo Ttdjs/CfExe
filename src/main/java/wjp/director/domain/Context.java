@@ -3,7 +3,6 @@ package wjp.director.domain;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
-import wjp.director.domain.DTO.ParamDTO;
 import wjp.director.domain.DTO.DataDTO;
 
 import java.util.*;
@@ -15,15 +14,16 @@ import java.util.concurrent.CompletableFuture;
  * @author lingse
  */
 @Builder
-public class ApiContext {
-    PlayBook playBook;
+public class Context {
+    @Setter
+    @Getter
+    Script script;
     final private Map<ExecuteTask, CompletableFuture<DataDTO<?>>> resultMap = new HashMap<>();
     @Getter
-    // todo ParamDTO
     private Object paramDTO;
 
-    public List<ExecuteTask> queryDependencyByTask(ExecuteTask executeTask) {
-        return playBook.queryDependencyByTask(executeTask);
+    public List<ExecuteTask> queryDependency(ExecuteTask executeTask) {
+        return script.getDependency(executeTask);
     }
 
     public CompletableFuture<DataDTO<?>> queryResultByTask(Task task) {
@@ -34,6 +34,9 @@ public class ApiContext {
         resultMap.put(executeTask, result);
     }
     public List<ExecuteTask> queryAggreTaskDependency() {
-        return playBook.getAggreTaskDepedencys();
+        return script.getAggreTaskDepedencys();
+    }
+    public Object queryDefaultValue(ExecuteTask task) {
+        return  script.getDefaultValue(task);
     }
 }

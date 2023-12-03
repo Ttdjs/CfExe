@@ -13,7 +13,6 @@ public class DataDTO<T> {
     private int code;
     private String message;
     Throwable exception;
-    // todo 获取data如果code ！= 0，应该抛异常
     T data;
     boolean isSuccess() {
         return code == 0;
