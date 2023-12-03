@@ -2,7 +2,6 @@ package example;
 
 import example.Access.CFAccessService;
 import example.Access.DirectrAccessService;
-import example.Manager.TestDataManager;
 import example.Task.RpcTaskParamDot;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
@@ -10,13 +9,10 @@ import lombok.NoArgsConstructor;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import wjp.director.annotation.HandlerMethod;
-import wjp.director.domain.Context;
-import wjp.director.domain.DTO.DataDTO;
-import wjp.director.domain.Scene;
 
 import java.lang.reflect.Method;
 import java.util.*;
-import java.util.function.Function;
+import java.util.concurrent.CompletableFuture;import java.util.function.Function;
 import java.util.stream.Collectors;
 
 public class SceneTest {
@@ -24,7 +20,7 @@ public class SceneTest {
     DirectrAccessService directrAccessService = new DirectrAccessService();
     private final Res allRight =  new Res(true, true);
     int count = 10;
-
+    // todo 聚合函数抛异常的情况测试
     @Test
     void testSimple() {
         Assertions.assertEquals(allRight ,sceneTest(count, directrAccessService::testSimple, cfAccessService::testSimple, "simple"));
@@ -117,4 +113,16 @@ public class SceneTest {
     }
 
 
-}
+public static class CfTest {
+    @Test
+    public void testCompose() {
+        CompletableFuture<String> stringCompletableFuture = CompletableFuture.supplyAsync(() -> {
+            try {
+                Thread.sleep(100l);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+            return "a";
+        });
+    }
+}}

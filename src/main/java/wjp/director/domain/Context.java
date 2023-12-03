@@ -39,4 +39,8 @@ public class Context {
     public Object queryDefaultValue(ExecuteTask task) {
         return  script.getDefaultValue(task);
     }
+   // todo 完善逻辑
+    public int queryRetryTime(ExecuteTask task) {
+        return 1;
+    }
 }

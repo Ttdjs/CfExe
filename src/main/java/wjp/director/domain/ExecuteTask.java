@@ -39,31 +39,48 @@ public class ExecuteTask extends Task{
         forceAsync = annotation.forceAsync();
     }
     public void doHandler(Context context) {
-        CompletableFuture<?> res;
+        CompletableFuture<Object> res = new CompletableFuture<>();
         try {
-            res = this.getParas(context).thenCompose(argument -> {
-                CompletableFuture<?> midRes;
-                Object invokeResult;
-                if (forceAsync && !invokeMethod.getReturnType().equals(CompletableFuture.class)) {
-                    invokeResult = CompletableFuture.supplyAsync(() -> this.doInvoke(invokeMethod, argument), ThreadPoolManager.getThreadPool(context.getScript().getName()));
-                } else {
-                    invokeResult = this.doInvoke(invokeMethod, argument);
-                }
-                if (invokeResult instanceof CompletableFuture) {
-                    midRes = (CompletableFuture<?>) invokeResult;
-                } else {
-                    CompletableFuture<Object> objectCompletableFuture = new CompletableFuture<>();
-                    objectCompletableFuture.complete(invokeResult);
-                    midRes = objectCompletableFuture;
-                }
-                return midRes;
-            });
+            this.getParas(context).thenAccept(argument -> doInvoke(context, argument, res, context.queryRetryTime(this)));
         } catch (Exception e) {
-            res = new CompletableFuture<>();
             res.completeExceptionally(e);
         }
         context.putResultForTask(this, res.handle(DefaultHandler.builder().defaultValue(context.queryDefaultValue(this)).build()));
     }
+
+    private CompletableFuture<?> doInvoke(Context context, Object[] argument) {
+        CompletableFuture<?> midRes;
+        Object invokeResult;
+        if (forceAsync && !invokeMethod.getReturnType().equals(CompletableFuture.class)) {
+            invokeResult = CompletableFuture.supplyAsync(() -> this.doInvoke(invokeMethod, argument), ThreadPoolManager.getThreadPool(context.getScript().getName()));
+        } else {
+            invokeResult = this.doInvoke(invokeMethod, argument);
+        }
+        if (invokeResult instanceof CompletableFuture) {
+            midRes = (CompletableFuture<?>) invokeResult;
+        } else {
+            CompletableFuture<Object> objectCompletableFuture = new CompletableFuture<>();
+            objectCompletableFuture.complete(invokeResult);
+            midRes = objectCompletableFuture;
+        }
+        return midRes;
+    }
+    // todo 单测抛异常场景
+    private void doInvoke(Context context, Object[] argument, CompletableFuture<Object> result, int retryTime) {
+        CompletableFuture<?> completableFuture = doInvoke(context, argument);
+        completableFuture.whenComplete((r, t) -> {
+            if (t == null) {
+                result.complete(r);
+            } else if (retryTime > 0) {
+                log.info("第{}次重试" + this.getClass().getSimpleName(), retryTime, t);
+                doInvoke(context, argument, result, retryTime - 1);
+            } else {
+                result.completeExceptionally(t);
+            }
+        });
+
+    }
+
     @Override
     public List<? extends Task> queryDependency(Context context) {
         return context.queryDependency(this);
