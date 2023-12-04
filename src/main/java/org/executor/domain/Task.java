@@ -1,6 +1,6 @@
-package wjp.director.domain;
+package org.executor.domain;
 
-import wjp.director.domain.DTO.DataDTO;
+import org.executor.domain.DTO.DataDTO;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;

@@ -1,4 +1,4 @@
-package wjp.director.domain;
+package org.executor.domain;
 
 import org.junit.Assert;
 

@@ -1,9 +1,9 @@
-package wjp.director.domain;
+package org.executor.domain;
 
 import lombok.Getter;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.Validate;
-import wjp.director.domain.DTO.DataDTO;
+import org.executor.domain.DTO.DataDTO;
 
 import java.util.*;
 
@@ -24,6 +24,7 @@ public class Script {
     private final AggreTask aggreTask;
     private final List<ExecuteTask> aggreTaskDepedencys;
     private final Map<ExecuteTask, Object> defaultValueMap;
+    private final Map<ExecuteTask, Integer> retryTimeMap;
 
     public List<ExecuteTask> getDependency(ExecuteTask task) {
         return unmodifiableList(dependencys.getOrDefault(task, emptyList()));
@@ -34,17 +35,21 @@ public class Script {
     public Object getDefaultValue(ExecuteTask task) {
         return defaultValueMap.get(task);
     }
+    public int getRetryTime(ExecuteTask task) {
+        return retryTimeMap.getOrDefault(task, 0);
+    }
     public Script(Scene scene) {
         this.aggreTask = scene.getAggreTask();
         this.dependencys = new HashMap<>(scene.getDependencys());
         this.executeTasks = new ArrayList<>(scene.getExecuteTasks());
         this.aggreTaskDepedencys = new ArrayList<>(scene.getAggreTaskDepedencys());
         this.defaultValueMap = new HashMap<>(scene.getDefaultValueMap());
+        this.retryTimeMap = new HashMap<>(scene.getRetryTimeMap());
         this.name = scene.getSceneName();
         topoSort();
     }
 
-    public  DataDTO<?> execute(Context context) {
+    public DataDTO<?> execute(Context context) {
         context.setScript(this);
         sortedExecuteTask.forEach(x -> x.doHandler(context));
         return aggreTask.doAggre(context);

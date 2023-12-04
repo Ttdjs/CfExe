@@ -1,4 +1,4 @@
-package wjp.director.utils;
+package org.executor.utils;
 
 import java.util.Collection;
 import java.util.Objects;

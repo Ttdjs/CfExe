@@ -1,9 +1,9 @@
-package wjp.director.domain;
+package org.executor.domain;
 
 import lombok.Getter;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.Validate;
-import wjp.director.utils.CommonUtils;
+import org.executor.utils.CommonUtils;
 
 import java.util.*;
 
@@ -20,6 +20,7 @@ public class Scene {
     // 执行顺序
     private AggreTask aggreTask;
     private Map<ExecuteTask, Object> defaultValueMap = new HashMap<>();
+    private final Map<ExecuteTask, Integer> retryTimeMap = new HashMap<>();
 
     public  Scene sceneName(String name) {
         Validate.notBlank(name, "api名称不允许为空");
@@ -53,6 +54,11 @@ public class Scene {
         dependencys.put(task, Arrays.asList(dependency));
         return this;
     }
+    public Scene retryTimes(ExecuteTask task, int retryTime) {
+        Validate.isTrue(retryTime > 0, "重复次数需要大于0");
+        retryTimeMap.put(task, retryTime);
+        return this;
+    }
 
     public  Scene aggreTaskDepedency(ExecuteTask... aggreTaskDepedency) {
         Validate.isTrue(CollectionUtils.isEmpty(this.aggreTaskDepedencys), "不能为聚合任务重复添加依赖任务");
@@ -71,6 +77,7 @@ public class Scene {
         dependencys.forEach((key, value) -> {
             Validate.isTrue(executeTasks.contains(key) && executeTasks.containsAll(value), "所有执行任务都需要注册");
         });
+        Validate.isTrue(executeTasks.containsAll(retryTimeMap.keySet()));
         Validate.isTrue(executeTasks.containsAll(defaultValueMap.keySet()), "所有有默认值的执行任务都需要注册");
         Validate.isTrue(executeTasks.containsAll(aggreTaskDepedencys), "聚合任务依赖的所有任务都需要注册");
     }

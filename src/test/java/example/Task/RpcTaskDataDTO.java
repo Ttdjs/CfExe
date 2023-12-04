@@ -1,9 +1,9 @@
 package example.Task;
 
 import example.Manager.RpcManager;
-import wjp.director.annotation.HandlerMethod;
-import wjp.director.domain.DTO.DataDTO;
-import wjp.director.domain.ExecuteTask;
+import org.executor.annotation.HandlerMethod;
+import org.executor.domain.DTO.DataDTO;
+import org.executor.domain.ExecuteTask;
 
 import java.util.concurrent.CompletableFuture;
 

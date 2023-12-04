@@ -1,7 +1,7 @@
 package example.Task;
 
-import wjp.director.annotation.AggreMethod;
-import wjp.director.domain.AggreTask;
+import org.executor.annotation.AggreMethod;
+import org.executor.domain.AggreTask;
 
 import java.util.HashMap;
 import java.util.Map;

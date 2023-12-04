@@ -1,9 +1,9 @@
-package wjp.director.domain;
+package org.executor.domain;
 
 import lombok.EqualsAndHashCode;
 import lombok.extern.slf4j.Slf4j;
-import wjp.director.Manager.ThreadPoolManager;
-import wjp.director.annotation.HandlerMethod;
+import org.executor.Manager.ThreadPoolManager;
+import org.executor.annotation.HandlerMethod;
 
 import java.lang.reflect.Method;
 import java.util.Arrays;
@@ -65,7 +65,6 @@ public class ExecuteTask extends Task{
         }
         return midRes;
     }
-    // todo 单测抛异常场景
     private void doInvoke(Context context, Object[] argument, CompletableFuture<Object> result, int retryTime) {
         CompletableFuture<?> completableFuture = doInvoke(context, argument);
         completableFuture.whenComplete((r, t) -> {

@@ -1,8 +1,8 @@
-package wjp.director.domain;
+package org.executor.domain;
 
 import lombok.Builder;
 import lombok.extern.slf4j.Slf4j;
-import wjp.director.domain.DTO.DataDTO;
+import org.executor.domain.DTO.DataDTO;
 
 import java.util.function.BiFunction;
 

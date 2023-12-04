@@ -1,7 +1,7 @@
-package wjp.director.domain;
+package org.executor.domain;
 
 import org.apache.commons.lang3.Validate;
-import wjp.director.domain.DTO.DataDTO;
+import org.executor.domain.DTO.DataDTO;
 
 import java.util.Map;
 import java.util.Objects;
@@ -24,7 +24,7 @@ public class Executor {
         scriptMap.put(scene.getSceneName(), script);
     }
     @SuppressWarnings("unchecked")
-    public <T> DataDTO<T> execute(String sceneName ,Context context) {
+    public <T> DataDTO<T> execute(String sceneName , Context context) {
         Validate.notNull(scriptMap.get(sceneName));
         return (DataDTO<T>) scriptMap.get(sceneName).execute(context);
     }

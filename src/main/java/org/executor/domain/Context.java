@@ -1,9 +1,9 @@
-package wjp.director.domain;
+package org.executor.domain;
 
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
-import wjp.director.domain.DTO.DataDTO;
+import org.executor.domain.DTO.DataDTO;
 
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
@@ -39,8 +39,7 @@ public class Context {
     public Object queryDefaultValue(ExecuteTask task) {
         return  script.getDefaultValue(task);
     }
-   // todo 完善逻辑
     public int queryRetryTime(ExecuteTask task) {
-        return 1;
+        return script.getRetryTime(task);
     }
 }

@@ -1,4 +1,4 @@
-package wjp.director.domain.DTO;
+package org.executor.domain.DTO;
 
 
 import lombok.Builder;

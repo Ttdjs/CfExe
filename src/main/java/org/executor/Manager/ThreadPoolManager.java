@@ -1,4 +1,4 @@
-package wjp.director.Manager;
+package org.executor.Manager;
 
 import java.util.concurrent.*;
 

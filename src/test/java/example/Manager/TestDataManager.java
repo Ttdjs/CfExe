@@ -2,12 +2,8 @@ package example.Manager;
 
 import example.Task.*;
 import lombok.Getter;
-import wjp.director.domain.Executor;
-import wjp.director.domain.Scene;
-
-import java.util.HashMap;
-import java.util.Map;
-import java.util.NoSuchElementException;
+import org.executor.domain.Executor;
+import org.executor.domain.Scene;
 
 @Getter
 public class TestDataManager {
@@ -29,17 +25,20 @@ public class TestDataManager {
     public static SimpleAggreTask simpleAggreTask = new SimpleAggreTask();
     public static ComplexAggreTask complexAggreTask = new ComplexAggreTask();
     public static FourTaskSyncAggreTask fourTaskSyncAggreTask =  new FourTaskSyncAggreTask();
-
+    public static ErrorAggreTask errorAggreTask = new ErrorAggreTask();
+    public static  RpcTaskRetry rpcTaskRetry = new RpcTaskRetry();
     static  {
-        initPlayBookSimple();
-        initPlayBookComplex();
-        initPlayBookDataDTO();
-        initPlayBookForTaskForceAsync();
-        initPlayBookForTaskSync();
-        initPlayBookRetVoid();
-        initPlayBookSimpleDefaultValue();
+        initSceneSimple();
+        initSceneComplex();
+        initSceneDataDTO();
+        initSceneForTaskForceAsync();
+        initSceneForTaskSync();
+        initSceneRetVoid();
+        initSceneSimpleDefaultValue();
+        initSceneError();
+        initSceneRetry();
     }
-    public static void initPlayBookSimple() {
+    public static void initSceneSimple() {
         Scene simple =  Scene.getInstance().sceneName("simple").executeTask(taskA, taskB, taskC)
                 .aggreTask(simpleAggreTask)
                 .dependency(taskB, taskA)
@@ -47,7 +46,24 @@ public class TestDataManager {
                 .aggreTaskDepedency(taskA, taskB, taskC)
                 .init(executor);
     }
-    public static void initPlayBookSimpleDefaultValue() {
+    public static void initSceneRetry() {
+        Scene simple =  Scene.getInstance().sceneName("retry").executeTask(rpcTaskRetry, taskB, taskC)
+                .aggreTask(simpleAggreTask)
+                .dependency(taskB, rpcTaskRetry)
+                .dependency(taskC, rpcTaskRetry)
+                .aggreTaskDepedency(rpcTaskRetry, taskB, taskC)
+                .retryTimes(rpcTaskRetry, 10)
+                .init(executor);
+    }
+    public static void initSceneError() {
+        Scene simple =  Scene.getInstance().sceneName("error").executeTask(taskA, taskB, taskC)
+                .aggreTask(errorAggreTask)
+                .dependency(taskB, taskA)
+                .dependency(taskC, taskA)
+                .aggreTaskDepedency(taskA, taskB, taskC)
+                .init(executor);
+    }
+    public static void initSceneSimpleDefaultValue() {
         Scene simple =  Scene.getInstance().sceneName("simpleDefaultValue").executeTask(taskA, taskB, taskC)
                 .aggreTask(simpleAggreTask)
                 .dependency(taskB, taskA)
@@ -57,7 +73,7 @@ public class TestDataManager {
                 .init(executor);
     }
 
-    public static void initPlayBookRetVoid() {
+    public static void initSceneRetVoid() {
         Scene simple =  Scene.getInstance().sceneName("retVoid").executeTask(taskA, taskB, taskRetVoid)
                 .aggreTask(simpleAggreTask)
                 .dependency(taskB, taskA)
@@ -68,7 +84,7 @@ public class TestDataManager {
    // a
     // taskSync, taskSync2
     // c
-    public static void initPlayBookForTaskSync() {
+    public static void initSceneForTaskSync() {
         Scene simple =  Scene.getInstance().sceneName("fourTaskSync").executeTask(taskA, taskSync2,  taskSync)
                 .aggreTask(simpleAggreTask)
                 .dependency(taskSync, taskA)
@@ -77,7 +93,7 @@ public class TestDataManager {
                 .aggreTaskDepedency(taskA, taskSync, taskSync2)
                 .init(executor);
     }
-    public static void initPlayBookForTaskForceAsync() {
+    public static void initSceneForTaskForceAsync() {
         Scene simple =  Scene.getInstance().sceneName("fourTaskForceAsync").executeTask(taskA, taskForceAsync,  taskForceAsync2)
                 .aggreTask(simpleAggreTask)
                 .dependency(taskForceAsync, taskA)
@@ -91,7 +107,7 @@ public class TestDataManager {
     // d , e
     // f, g
     // h
-    public static void initPlayBookComplex() {
+    public static void initSceneComplex() {
         Scene complex = Scene.getInstance().sceneName("complex")
                 .executeTask(taskA, taskB, taskC, taskD, taskE, taskF, taskG, taskH)
                 .aggreTask(complexAggreTask)
@@ -105,7 +121,7 @@ public class TestDataManager {
                 .dependency(taskH, taskB, taskA, taskF, taskC)
                 .init(executor);
     }
-    public static void initPlayBookDataDTO() {
+    public static void initSceneDataDTO() {
         Scene dataDTO =  Scene.getInstance().sceneName("dataDTO")
                 .executeTask(taskA, taskB, taskC, taskDataDTO)
                 .aggreTask(simpleAggreTask)
@@ -113,6 +129,25 @@ public class TestDataManager {
                 .dependency(taskC, taskA)
                 .dependency(taskDataDTO, taskB, taskC)
                 .aggreTaskDepedency(taskA, taskB, taskDataDTO)
+                .init(executor);
+    }
+
+    public static void initSceneError1() {
+        Scene simple =  Scene.getInstance().sceneName("error1").executeTask(taskA, taskB, taskC)
+                .aggreTask(simpleAggreTask)
+                .dependency(taskB, rpcTaskRetry)
+                .dependency(taskC, rpcTaskRetry)
+                .aggreTaskDepedency(rpcTaskRetry, taskB, taskC)
+                .retryTimes(rpcTaskRetry, 10)
+                .init(executor);
+    }
+    public static void initSceneError2() {
+        Scene simple =  Scene.getInstance().sceneName("error2").executeTask(taskA, taskB, taskC)
+                .aggreTask(simpleAggreTask)
+                .dependency(taskB, taskA)
+                .dependency(taskA, taskB)
+                .aggreTaskDepedency(taskA, taskB, taskC)
+                .retryTimes(taskA, 10)
                 .init(executor);
     }
 }
